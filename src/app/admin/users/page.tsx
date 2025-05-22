@@ -4,6 +4,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Edit, GraduationCap, Plus, Trash, User, UserCog, Users } from "lucide-react"
+import Link from "next/link"
 
 // Mock data for users
 const users = [
@@ -113,8 +114,11 @@ export default function UsersPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-3xl font-bold">Users</h1>
-        <Button>
-          <Plus className="mr-2 h-4 w-4" /> Add User
+        <Button asChild>
+          <Link href="/admin/users/add">
+            <Plus className="mr-2 h-4 w-4" />
+            Add User
+          </Link>
         </Button>
       </div>
 
@@ -209,11 +213,10 @@ export default function UsersPage() {
                   <TableCell>{formatDate(user.updatedAt)}</TableCell>
                   <TableCell className="text-right">
                     <div className="flex justify-end gap-2">
-                      <Button variant="ghost" size="icon">
-                        <Edit className="h-4 w-4" />
-                      </Button>
-                      <Button variant="ghost" size="icon">
-                        <Trash className="h-4 w-4" />
+                      <Button variant="ghost" size="icon" asChild>
+                        <Link href={`/admin/users/${user.id}`}>
+                          <Edit className="h-4 w-4" />
+                        </Link>
                       </Button>
                     </div>
                   </TableCell>
