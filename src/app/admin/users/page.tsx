@@ -1,93 +1,18 @@
+"use client"
+
+import { useUsers } from "@/hooks/useUsers"
+import { Skeleton } from "@/components/ui/skeleton"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Badge } from "@/components/ui/badge"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Edit, GraduationCap, Plus, Trash, User, UserCog, Users } from "lucide-react"
+import { Edit, GraduationCap, Plus, User, UserCog, Users } from "lucide-react"
 import Link from "next/link"
 
-// Mock data for users
-const users = [
-  {
-    id: 1,
-    name: "John Doe",
-    email: "john.doe@example.com",
-    role: "admin",
-    createdAt: "2023-01-15T10:00:00Z",
-    updatedAt: "2023-05-20T14:30:00Z",
-  },
-  {
-    id: 2,
-    name: "Jane Smith",
-    email: "jane.smith@example.com",
-    role: "user",
-    createdAt: "2023-02-10T09:15:00Z",
-    updatedAt: "2023-02-10T09:15:00Z",
-  },
-  {
-    id: 3,
-    name: "Michael Johnson",
-    email: "michael.j@university.edu",
-    role: "student",
-    country: "USA",
-    university: "State University",
-    course: "Computer Science",
-    language: "English",
-    createdAt: "2023-03-05T11:30:00Z",
-    updatedAt: "2023-04-12T16:45:00Z",
-  },
-  {
-    id: 4,
-    name: "Emily Davis",
-    email: "emily.davis@example.com",
-    role: "user",
-    createdAt: "2023-03-20T13:45:00Z",
-    updatedAt: "2023-03-20T13:45:00Z",
-  },
-  {
-    id: 5,
-    name: "Carlos Rodriguez",
-    email: "carlos.r@university.edu",
-    role: "student",
-    country: "Spain",
-    university: "Madrid University",
-    course: "Business Administration",
-    language: "Spanish",
-    createdAt: "2023-04-02T08:20:00Z",
-    updatedAt: "2023-04-15T10:10:00Z",
-  },
-  {
-    id: 6,
-    name: "Sarah Wilson",
-    email: "sarah.w@example.com",
-    role: "user",
-    createdAt: "2023-04-18T15:30:00Z",
-    updatedAt: "2023-04-18T15:30:00Z",
-  },
-  {
-    id: 7,
-    name: "David Brown",
-    email: "david.b@university.edu",
-    role: "student",
-    country: "UK",
-    university: "London University",
-    course: "Engineering",
-    language: "English",
-    createdAt: "2023-05-05T09:45:00Z",
-    updatedAt: "2023-05-10T14:20:00Z",
-  },
-  {
-    id: 8,
-    name: "Lisa Chen",
-    email: "lisa.chen@example.com",
-    role: "admin",
-    createdAt: "2023-05-12T11:15:00Z",
-    updatedAt: "2023-05-12T11:15:00Z",
-  },
-]
-
 // Helper function to get initials from name
-function getInitials(name: string) {
+function getInitials(name: string | null | undefined) {
+  if (!name) return ""
   return name
     .split(" ")
     .map((n) => n[0])
@@ -95,17 +20,22 @@ function getInitials(name: string) {
     .toUpperCase()
 }
 
-// Helper function to format date
+// ✅ Formatação de data estável (sem depender de locale)
 function formatDate(dateString: string) {
-  return new Date(dateString).toLocaleDateString("en-US", {
-    year: "numeric",
-    month: "short",
-    day: "numeric",
-  })
+  return new Date(dateString).toISOString().slice(0, 10) // ex: 2025-05-22
 }
 
 export default function UsersPage() {
-  // Count users by role
+  const { users, loading, error } = useUsers()
+
+  if (loading) {
+    return <Skeleton className="h-10 w-full rounded-md mb-4" />
+  }
+
+  if (error) {
+    return <p className="text-red-500">{error}</p>
+  }
+
   const adminCount = users.filter((user) => user.role === "admin").length
   const studentCount = users.filter((user) => user.role === "student").length
   const regularUserCount = users.filter((user) => user.role === "user").length
@@ -194,19 +124,13 @@ export default function UsersPage() {
                   </TableCell>
                   <TableCell>
                     {user.role === "admin" && (
-                      <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">
-                        Admin
-                      </Badge>
+                      <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">Admin</Badge>
                     )}
                     {user.role === "student" && (
-                      <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">
-                        Student
-                      </Badge>
+                      <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">Student</Badge>
                     )}
                     {user.role === "user" && (
-                      <Badge variant="outline" className="bg-gray-50 text-gray-700 border-gray-200">
-                        User
-                      </Badge>
+                      <Badge variant="outline" className="bg-gray-50 text-gray-700 border-gray-200">User</Badge>
                     )}
                   </TableCell>
                   <TableCell>{formatDate(user.createdAt)}</TableCell>
@@ -245,7 +169,7 @@ export default function UsersPage() {
             </TableHeader>
             <TableBody>
               {users
-                .filter((user) => user.role === "student")
+                .filter((user) => user.userType === "student")
                 .map((student) => (
                   <TableRow key={student.id}>
                     <TableCell>

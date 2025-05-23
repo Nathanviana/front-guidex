@@ -1,25 +1,35 @@
-"use client"
+"use client";
 
-import type React from "react"
+import React, { useState } from "react";
+import { useRouter } from "next/navigation";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Switch } from "@/components/ui/switch";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { ArrowLeft, Save } from "lucide-react";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { AlertCircle } from "lucide-react";
+import axios from "@/utils/axios";
 
-import { useState } from "react"
-import { useRouter } from "next/navigation"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Switch } from "@/components/ui/switch"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { ArrowLeft, Save } from "lucide-react"
-import { Alert, AlertDescription } from "@/components/ui/alert"
-import { AlertCircle } from "lucide-react"
-
-export default function AddUserPage() {
-  const router = useRouter()
-  const [error, setError] = useState("")
-
+const AddUserPage = () => {
+  const router = useRouter();
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -27,51 +37,85 @@ export default function AddUserPage() {
     name: "",
     role: "user",
     isActive: true,
-    userType: "NORMAL",
+    userType: "normal", // usar maiúsculo conforme enum do backend
     country: "",
     university: "",
     course: "",
     language: "",
-  })
+  });
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const handleChange = (field: string, value: any) => {
-    setFormData((prev) => ({ ...prev, [field]: value }))
-  }
+    setFormData((prev) => ({ ...prev, [field]: value }));
+  };
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    setError("")
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError("");
 
-    // Basic validation
+    // Validações básicas
     if (!formData.email || !formData.password) {
-      setError("Email and password are required")
-      return
+      setError("Email and password are required");
+      return;
     }
 
     if (formData.password !== formData.confirmPassword) {
-      setError("Passwords do not match")
-      return
+      setError("Passwords do not match");
+      return;
     }
 
     if (
-      formData.userType === "STUDENT" &&
-      (!formData.country || !formData.university || !formData.course || !formData.language)
+      formData.userType === "student" &&
+      (!formData.country ||
+        !formData.university ||
+        !formData.course ||
+        !formData.language)
     ) {
-      setError("All student information is required")
-      return
+      setError("All student information is required");
+      return;
     }
 
-    // Here you would normally save the user to your database
-    console.log("Creating new user:", formData)
+    setLoading(true);
 
-    // Redirect back to users list
-    router.push("/admin/users")
-  }
+    try {
+      // Envia dados para sua API
+      const response = await axios.post("/users", {
+        email: formData.email,
+        password: formData.password,
+        name: formData.name,
+        role: formData.role,
+        isActive: formData.isActive,
+        userType: formData.userType,
+        country: formData.country,
+        university: formData.university,
+        course: formData.course,
+        language: formData.language,
+      });
+
+      // Se sucesso, redireciona para lista de usuários
+      router.push("/admin/users");
+    } catch (err: any) {
+      console.error("Registration error:", err);
+      if (err.response) {
+        setError(err.response?.data?.error || "An error occurred");
+      } else {
+        setError("Network error. Please try again.");
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-4">
-        <Button variant="outline" size="icon" onClick={() => router.push("/admin/users")}>
+        <Button
+          variant="outline"
+          size="icon"
+          onClick={() => router.push("/admin/users")}
+          disabled={loading}
+        >
           <ArrowLeft className="h-4 w-4" />
         </Button>
         <h1 className="text-3xl font-bold">Add New User</h1>
@@ -81,7 +125,9 @@ export default function AddUserPage() {
         <Card>
           <CardHeader>
             <CardTitle>User Information</CardTitle>
-            <CardDescription>Enter the details for the new user account</CardDescription>
+            <CardDescription>
+              Enter the details for the new user account
+            </CardDescription>
           </CardHeader>
           <CardContent>
             {error && (
@@ -110,6 +156,7 @@ export default function AddUserPage() {
                     value={formData.email}
                     onChange={(e) => handleChange("email", e.target.value)}
                     required
+                    disabled={loading}
                   />
                 </div>
                 <div className="space-y-2">
@@ -119,19 +166,23 @@ export default function AddUserPage() {
                     placeholder="John Doe"
                     value={formData.name}
                     onChange={(e) => handleChange("name", e.target.value)}
+                    disabled={loading}
                   />
                 </div>
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <Label htmlFor="isActive">Active Status</Label>
-                    <Switch
-                      id="isActive"
-                      checked={formData.isActive}
-                      onCheckedChange={(checked) => handleChange("isActive", checked)}
-                    />
-                  </div>
-                  <p className="text-sm text-muted-foreground">Inactive users cannot log in to the system</p>
+                <div className="space-y-2 flex items-center justify-between">
+                  <Label htmlFor="isActive">Active Status</Label>
+                  <Switch
+                    id="isActive"
+                    checked={formData.isActive}
+                    onCheckedChange={(checked) =>
+                      handleChange("isActive", checked)
+                    }
+                    disabled={loading}
+                  />
                 </div>
+                <p className="text-sm text-muted-foreground">
+                  Inactive users cannot log in to the system
+                </p>
               </TabsContent>
 
               <TabsContent value="details" className="space-y-4">
@@ -145,23 +196,29 @@ export default function AddUserPage() {
                     className="flex flex-col space-y-1"
                   >
                     <div className="flex items-center space-x-2">
-                      <RadioGroupItem value="NORMAL" id="normal" />
+                      <RadioGroupItem value="normal" id="normal" disabled={loading} />
                       <Label htmlFor="normal">Normal</Label>
                     </div>
                     <div className="flex items-center space-x-2">
-                      <RadioGroupItem value="STUDENT" id="student" />
+                      <RadioGroupItem value="student" id="student" disabled={loading} />
                       <Label htmlFor="student">Student</Label>
                     </div>
                   </RadioGroup>
                 </div>
 
-                {formData.userType === "STUDENT" && (
+                {formData.userType === "student" && (
                   <>
                     <div className="space-y-2">
                       <Label htmlFor="country">
                         Country <span className="text-red-500">*</span>
                       </Label>
-                      <Select value={formData.country} onValueChange={(value) => handleChange("country", value)}>
+                      <Select
+                        value={formData.country}
+                        onValueChange={(value) =>
+                          handleChange("country", value)
+                        }
+                        disabled={loading}
+                      >
                         <SelectTrigger>
                           <SelectValue placeholder="Select country" />
                         </SelectTrigger>
@@ -187,7 +244,10 @@ export default function AddUserPage() {
                         id="university"
                         placeholder="Harvard University"
                         value={formData.university}
-                        onChange={(e) => handleChange("university", e.target.value)}
+                        onChange={(e) =>
+                          handleChange("university", e.target.value)
+                        }
+                        disabled={loading}
                       />
                     </div>
                     <div className="space-y-2">
@@ -199,13 +259,20 @@ export default function AddUserPage() {
                         placeholder="Computer Science"
                         value={formData.course}
                         onChange={(e) => handleChange("course", e.target.value)}
+                        disabled={loading}
                       />
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor="language">
                         Language <span className="text-red-500">*</span>
                       </Label>
-                      <Select value={formData.language} onValueChange={(value) => handleChange("language", value)}>
+                      <Select
+                        value={formData.language}
+                        onValueChange={(value) =>
+                          handleChange("language", value)
+                        }
+                        disabled={loading}
+                      >
                         <SelectTrigger>
                           <SelectValue placeholder="Select language" />
                         </SelectTrigger>
@@ -236,6 +303,7 @@ export default function AddUserPage() {
                     placeholder="••••••••"
                     value={formData.password}
                     onChange={(e) => handleChange("password", e.target.value)}
+                    disabled={loading}
                     required
                   />
                 </div>
@@ -248,13 +316,20 @@ export default function AddUserPage() {
                     type="password"
                     placeholder="••••••••"
                     value={formData.confirmPassword}
-                    onChange={(e) => handleChange("confirmPassword", e.target.value)}
+                    onChange={(e) =>
+                      handleChange("confirmPassword", e.target.value)
+                    }
+                    disabled={loading}
                     required
                   />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="role">Role</Label>
-                  <Select value={formData.role} onValueChange={(value) => handleChange("role", value)}>
+                  <Select
+                    value={formData.role}
+                    onValueChange={(value) => handleChange("role", value)}
+                    disabled={loading}
+                  >
                     <SelectTrigger>
                       <SelectValue placeholder="Select role" />
                     </SelectTrigger>
@@ -263,21 +338,29 @@ export default function AddUserPage() {
                       <SelectItem value="admin">Admin</SelectItem>
                     </SelectContent>
                   </Select>
-                  <p className="text-sm text-muted-foreground">Admin users have full access to all features</p>
+                  <p className="text-sm text-muted-foreground">
+                    Admin users have full access to all features
+                  </p>
                 </div>
               </TabsContent>
             </Tabs>
           </CardContent>
           <CardFooter className="flex justify-between">
-            <Button variant="outline" onClick={() => router.push("/admin/users")}>
+            <Button
+              variant="outline"
+              onClick={() => router.push("/admin/users")}
+              disabled={loading}
+            >
               Cancel
             </Button>
-            <Button type="submit">
+            <Button type="submit" disabled={loading}>
               <Save className="mr-2 h-4 w-4" /> Create User
             </Button>
           </CardFooter>
         </Card>
       </form>
     </div>
-  )
-}
+  );
+};
+
+export default AddUserPage;
