@@ -20,7 +20,6 @@ function getInitials(name: string | null | undefined) {
     .toUpperCase()
 }
 
-// ✅ Formatação de data estável (sem depender de locale)
 function formatDate(dateString: string) {
   return new Date(dateString).toISOString().slice(0, 10) // ex: 2025-05-22
 }
@@ -37,7 +36,7 @@ export default function UsersPage() {
   }
 
   const adminCount = users.filter((user) => user.role === "admin").length
-  const studentCount = users.filter((user) => user.role === "student").length
+  const studentCount = users.filter((user) => user.userType === "student").length
   const regularUserCount = users.filter((user) => user.role === "user").length
 
   return (

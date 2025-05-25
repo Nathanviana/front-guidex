@@ -5,8 +5,10 @@ export type User = {
   id: number
   name: string
   email: string
+  password: string
   role: string
   userType: "normal" | "student"
+  isActive: boolean
   country?: string
   university?: string
   course?: string
