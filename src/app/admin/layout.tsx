@@ -3,22 +3,27 @@
 
 import type React from "react"
 
+import { useAuth } from "@/hooks/useAuth"
 import { useState, useEffect } from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { Building2, Calendar, Home, LifeBuoy, LogOut, Menu, Settings, User, Users, X } from "lucide-react"
+import { Building2, Calendar, Home, LifeBuoy, LogOut, Menu, User, Users, X } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 import { cn } from "@/lib/utils"
+import axios from "@/utils/axios"
+import { useRouter } from "next/navigation"
 
 export default function AdminLayout({
   children,
 }: {
   children: React.ReactNode
 }) {
+  const { user, loading } = useAuth()
   const pathname = usePathname()
   const [isMobile, setIsMobile] = useState(false)
   const [isOpen, setIsOpen] = useState(false)
+  const router = useRouter()
 
   // Check if we're on mobile
   useEffect(() => {
@@ -34,13 +39,21 @@ export default function AdminLayout({
     }
   }, [])
 
+  const handleLogout = async () => {
+  try {
+    await axios.post("/auth/logout")
+    router.push("/login")
+  } catch (error) {
+    console.error("Erro ao fazer logout", error)
+  }
+}
+
   const menuItems = [
     { href: "/admin", icon: Home, label: "Dashboard" },
     { href: "/admin/users", icon: Users, label: "Users" },
     { href: "/admin/accommodations", icon: Building2, label: "Accommodations" },
     { href: "/admin/events", icon: Calendar, label: "Events" },
     { href: "/admin/emergency-services", icon: LifeBuoy, label: "Emergency Services" },
-    { href: "/admin/settings", icon: Settings, label: "Settings" },
   ]
 
   // Desktop sidebar
@@ -78,11 +91,11 @@ export default function AdminLayout({
               <User className="h-4 w-4" />
             </div>
             <div>
-              <p className="text-sm font-medium">Admin User</p>
-              <p className="text-xs text-muted-foreground">admin@example.com</p>
+              <p className="text-sm font-medium">{loading ? "Carregando..." : user?.name}</p>
+              <p className="text-xs text-muted-foreground">{loading ? "" : user?.email}</p>
             </div>
           </div>
-          <Button variant="ghost" size="icon">
+          <Button variant="ghost" size="icon" onClick={handleLogout}>
             <LogOut className="h-4 w-4" />
           </Button>
         </div>
@@ -138,11 +151,11 @@ export default function AdminLayout({
                 <User className="h-4 w-4" />
               </div>
               <div>
-                <p className="text-sm font-medium">Admin User</p>
-                <p className="text-xs text-muted-foreground">admin@example.com</p>
+                <p className="text-sm font-medium">{loading ? "Carregando..." : user?.name}</p>
+                <p className="text-xs text-muted-foreground">{loading ? "" : user?.email}</p>
               </div>
             </div>
-            <Button variant="ghost" size="icon">
+            <Button variant="ghost" size="icon" onClick={handleLogout}>
               <LogOut className="h-4 w-4" />
             </Button>
           </div>
