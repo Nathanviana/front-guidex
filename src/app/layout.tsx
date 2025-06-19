@@ -1,16 +1,5 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -24,10 +13,14 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body
-        suppressHydrationWarning
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
+      <head>
+        {/* Google Fonts via <link> para evitar next/font */}
+        <link
+          rel="stylesheet"
+          href="https://fonts.googleapis.com/css2?family=Geist&amp;family=Geist+Mono&amp;display=swap"
+        />
+      </head>
+      <body suppressHydrationWarning className="antialiased font-geist font-geist-mono">
         {children}
       </body>
     </html>
