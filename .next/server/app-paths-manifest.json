@@ -1,0 +1,20 @@
+{
+  "/_not-found/page": "app/_not-found/page.js",
+  "/favicon.ico/route": "app/favicon.ico/route.js",
+  "/(auth)/login/page": "app/(auth)/login/page.js",
+  "/(auth)/register/page": "app/(auth)/register/page.js",
+  "/page": "app/page.js",
+  "/admin/accommodations/add/page": "app/admin/accommodations/add/page.js",
+  "/admin/accommodations/[id]/page": "app/admin/accommodations/[id]/page.js",
+  "/admin/accommodations/page": "app/admin/accommodations/page.js",
+  "/admin/emergency-services/add/page": "app/admin/emergency-services/add/page.js",
+  "/admin/emergency-services/[id]/page": "app/admin/emergency-services/[id]/page.js",
+  "/admin/emergency-services/page": "app/admin/emergency-services/page.js",
+  "/admin/events/[id]/page": "app/admin/events/[id]/page.js",
+  "/admin/events/add/page": "app/admin/events/add/page.js",
+  "/admin/events/page": "app/admin/events/page.js",
+  "/admin/users/[id]/page": "app/admin/users/[id]/page.js",
+  "/admin/page": "app/admin/page.js",
+  "/admin/users/add/page": "app/admin/users/add/page.js",
+  "/admin/users/page": "app/admin/users/page.js"
+}

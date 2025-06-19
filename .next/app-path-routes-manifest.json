@@ -1,0 +1,20 @@
+{
+  "/_not-found/page": "/_not-found",
+  "/favicon.ico/route": "/favicon.ico",
+  "/(auth)/login/page": "/login",
+  "/(auth)/register/page": "/register",
+  "/page": "/",
+  "/admin/accommodations/add/page": "/admin/accommodations/add",
+  "/admin/accommodations/[id]/page": "/admin/accommodations/[id]",
+  "/admin/accommodations/page": "/admin/accommodations",
+  "/admin/emergency-services/add/page": "/admin/emergency-services/add",
+  "/admin/emergency-services/[id]/page": "/admin/emergency-services/[id]",
+  "/admin/emergency-services/page": "/admin/emergency-services",
+  "/admin/events/[id]/page": "/admin/events/[id]",
+  "/admin/events/add/page": "/admin/events/add",
+  "/admin/events/page": "/admin/events",
+  "/admin/users/[id]/page": "/admin/users/[id]",
+  "/admin/page": "/admin",
+  "/admin/users/add/page": "/admin/users/add",
+  "/admin/users/page": "/admin/users"
+}
